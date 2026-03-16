@@ -1,5 +1,4 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import { test, expect } from 'vitest';
 import {
   createInitialState,
   setDirection,
@@ -14,9 +13,9 @@ test('moves one cell in current direction', () => {
   const initial = createInitialState(fixedRandom(0));
   const next = stepGame(initial, fixedRandom(0));
 
-  assert.equal(next.snake[0].x, initial.snake[0].x + 1);
-  assert.equal(next.snake[0].y, initial.snake[0].y);
-  assert.equal(next.score, 0);
+  expect(next.snake[0].x).toBe(initial.snake[0].x + 1);
+  expect(next.snake[0].y).toBe(initial.snake[0].y);
+  expect(next.score).toBe(0);
 });
 
 test('cannot reverse direction directly', () => {
@@ -24,7 +23,7 @@ test('cannot reverse direction directly', () => {
   const withReverse = setDirection(initial, 'left');
   const next = stepGame(withReverse, fixedRandom(0));
 
-  assert.equal(next.direction, 'right');
+  expect(next.direction).toBe('right');
 });
 
 test('grows and increments score when eating food', () => {
@@ -39,8 +38,8 @@ test('grows and increments score when eating food', () => {
 
   const next = stepGame(state, fixedRandom(0));
 
-  assert.equal(next.snake.length, 2);
-  assert.equal(next.score, 1);
+  expect(next.snake.length).toBe(2);
+  expect(next.score).toBe(1);
 });
 
 test('game over when snake hits wall', () => {
@@ -52,7 +51,7 @@ test('game over when snake hits wall', () => {
   };
 
   const next = stepGame(state, fixedRandom(0));
-  assert.equal(next.gameOver, true);
+  expect(next.gameOver).toBe(true);
 });
 
 test('game over when snake hits itself', () => {
@@ -70,7 +69,7 @@ test('game over when snake hits itself', () => {
   };
 
   const next = stepGame(state, fixedRandom(0));
-  assert.equal(next.gameOver, true);
+  expect(next.gameOver).toBe(true);
 });
 
 test('food placement avoids snake cells', () => {
@@ -80,5 +79,5 @@ test('food placement avoids snake cells', () => {
   ];
   const food = placeFood(snake, 2, fixedRandom(0));
 
-  assert.deepEqual(food, { x: 0, y: 1 });
+  expect(food).toEqual({ x: 0, y: 1 });
 });
