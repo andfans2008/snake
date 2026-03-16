@@ -6,13 +6,28 @@
       <p>Status: <strong data-status>{{ statusText }}</strong></p>
     </section>
 
-    <section class="board" data-grid aria-label="Snake board">
-      <div
-        v-for="cell in cells"
-        :key="cell.key"
-        class="cell"
-        :class="cellClass(cell)"
-      ></div>
+    <section class="board-row">
+      <section class="board" data-grid aria-label="Snake board">
+        <div
+          v-for="cell in cells"
+          :key="cell.key"
+          class="cell"
+          :class="cellClass(cell)"
+        ></div>
+      </section>
+
+      <section class="speed" aria-label="Speed controls">
+        <label for="speed-select">Speed</label>
+        <select
+          id="speed-select"
+          v-model.number="selectedSpeed"
+          :disabled="started"
+        >
+          <option v-for="option in speedOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </section>
     </section>
 
     <section class="actions">
@@ -23,19 +38,6 @@
         {{ pauseLabel }}
       </button>
       <button type="button" @click="restart">Restart</button>
-    </section>
-
-    <section class="speed" aria-label="Speed controls">
-      <label for="speed-select">Speed</label>
-      <select
-        id="speed-select"
-        v-model.number="selectedSpeed"
-        :disabled="started"
-      >
-        <option v-for="option in speedOptions" :key="option.value" :value="option.value">
-          {{ option.label }}
-        </option>
-      </select>
     </section>
 
     <section class="controls" aria-label="Direction controls">
