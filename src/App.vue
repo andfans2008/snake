@@ -2,8 +2,8 @@
   <main class="container">
     <h1>Snake</h1>
     <section class="hud">
-      <p>Score: <strong>{{ state.score }}</strong></p>
-      <p>Status: <strong>{{ statusText }}</strong></p>
+      <p>Score: <strong data-score>{{ state.score }}</strong></p>
+      <p>Status: <strong data-status>{{ statusText }}</strong></p>
     </section>
 
     <section class="board" data-grid aria-label="Snake board">
@@ -16,8 +16,26 @@
     </section>
 
     <section class="actions">
-      <button type="button" @click="togglePauseAction">{{ pauseLabel }}</button>
+      <button type="button" @click="startGame" :disabled="started">
+        {{ started ? 'Started' : 'Start' }}
+      </button>
+      <button type="button" @click="togglePauseAction" :disabled="!started">
+        {{ pauseLabel }}
+      </button>
       <button type="button" @click="restart">Restart</button>
+    </section>
+
+    <section class="speed" aria-label="Speed controls">
+      <label for="speed-select">Speed</label>
+      <select
+        id="speed-select"
+        v-model.number="selectedSpeed"
+        :disabled="started"
+      >
+        <option v-for="option in speedOptions" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </option>
+      </select>
     </section>
 
     <section class="controls" aria-label="Direction controls">
@@ -43,9 +61,16 @@ import {
   togglePause,
 } from './snake-logic.js';
 
-const TICK_MS = 440;
+const speedOptions = [
+  { label: 'Slow', value: 600 },
+  { label: 'Normal', value: 440 },
+  { label: 'Fast', value: 300 },
+];
 
 const state = ref(createInitialState());
+const started = ref(false);
+const selectedSpeed = ref(speedOptions[1].value);
+let timerId = null;
 
 const cells = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => {
   const x = index % GRID_SIZE;
@@ -54,12 +79,14 @@ const cells = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => {
 });
 
 const statusText = computed(() => {
+  if (!started.value) return 'Ready';
   if (state.value.gameOver) return 'Game over';
   if (state.value.paused) return 'Paused';
   return 'Running';
 });
 
 const pauseLabel = computed(() => {
+  if (!started.value) return 'Pause';
   if (state.value.gameOver) return 'Pause';
   return state.value.paused ? 'Resume' : 'Pause';
 });
@@ -87,7 +114,12 @@ function cellClass(cell) {
 }
 
 function restart() {
+  if (timerId !== null) {
+    window.clearInterval(timerId);
+    timerId = null;
+  }
   state.value = createInitialState();
+  started.value = false;
 }
 
 function handleDirectionInput(dir) {
@@ -95,6 +127,7 @@ function handleDirectionInput(dir) {
 }
 
 function togglePauseAction() {
+  if (!started.value) return;
   state.value = togglePause(state.value);
 }
 
@@ -128,11 +161,14 @@ function tick() {
   state.value = stepGame(state.value);
 }
 
-let timerId = null;
+function startGame() {
+  if (started.value) return;
+  started.value = true;
+  timerId = window.setInterval(tick, selectedSpeed.value);
+}
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
-  timerId = window.setInterval(tick, TICK_MS);
 });
 
 onUnmounted(() => {

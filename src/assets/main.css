@@ -68,7 +68,8 @@ h1 {
 
 .actions,
 .controls,
-.controls div {
+.controls div,
+.speed {
   display: flex;
   gap: 8px;
 }
@@ -76,6 +77,19 @@ h1 {
 .actions,
 .controls {
   margin-top: 12px;
+}
+
+.speed {
+  align-items: center;
+  margin-top: 12px;
+}
+
+.speed label {
+  font-size: 14px;
+}
+
+.speed select {
+  padding: 4px 6px;
 }
 
 button {
@@ -88,6 +102,12 @@ button {
 
 button:hover {
   background: #efefef;
+}
+
+button:disabled,
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .hint {
